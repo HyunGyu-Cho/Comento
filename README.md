@@ -5,7 +5,3 @@
   - JDK/Tomcat/mybatis/Intellij 설치
   - mybatis 설치
   - 스프링 환경 구축
-### 2주차
-### 3주차
-### 4주차
-### 5주차
