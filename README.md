@@ -1,7 +1,71 @@
 ## 코멘토 5주인턴 과제제출
-### 1주차
-- 주제: 개발환경 구성
-  - github 계정 생성(기존 계정 이용)
-  - JDK/Tomcat/mybatis/Intellij 설치
-  - mybatis 설치
-  - 스프링 환경 구축
+### 2주차
+- 주제: 인터페이스 가이드 문서작성
+  - 부제: Client와 개발자의 협업 방법
+- 공공 데이터 API 문서 및 제공된 인터페이스 가이드를 참고해 API 가이드를 작성한다
+- SW활용률(접속자 수, 부서별 접속자 수, 로그인 요청 수, 게시글 작성 수)에 필요한 데이터가 무엇인지 고민해보고 내용에 맞게 문서를 작성(요청 파라미터 생각 및 응답 데이터 포맷 고려)한다
+- 작성방법: github에 ppt로 등록
+
+#### REST API 관련 학습내용
+1. HTTP통신
+- Client가 Server에 요청(Request)을 보내고 서버가 그에 대한 응답(Response)을 돌려주는 규칙
+- Request 구조
+  - 요청라인:
+    - 예시-> GET /articles/1 HTTP/1.1
+  - 헤더:
+    - 예시: <br/> Host: ex.com <br/> Authorization: Bearer token정보 <br/> Content-Type: application/json
+      - Host: 어느 서버로 보내는지
+      - Authorization: 인증 정보
+      - Content-Type: body 데이터 형식
+  - 바디: 서버에 보낼 실제 데이터. 보통 POST, PUT, PATCH에서 사용
+    - JSON 형식 예시: {"title": "제목", "content": "내용"}
+- Response구조
+    - 상태 줄:
+      - 예시-> HTTP/1.1 200 OK
+    - 응답 헤더: 
+      - 예시: <br/> Content-Type: application/json <br/> Content-Length: 120
+    - 응답 바디: 실제 데이터
+      - 예시: <br/> {"id": 1, "title": "안녕"}
+- HTTP 메서드
+  - GET: 데이터 조회
+  - POST: 데이터 생성
+  - PUT: 데이터 전체 수정
+  - PATCH: 데이터 일부 수정
+  - DELETE: 데이터 삭제
+- URL(Uniform Resource Locator)
+  - 경로파라미터
+  - 쿼리파라미터
+  - 쿠키파라미터
+  - 클라이언트가 서버의 어떤 자원에 요청할지 URL로 지정
+- 상태 코드:
+  - 200번대: 성공
+    - 200 OK
+    - 201 Created
+    - 204 No Content: 성공했지만 body없음
+  - 400번대: 클라이언트의 요청 문제
+    - 401 BAD REQUEST: 요청 형식 이상
+    - 401 Unauthorized: 인증 필요
+    - 403 Forbidden: 권한 없음
+    - 404 Not Found: 찾는 대상이 없음
+  - 500번대: 서버 문제
+    - 501 Internal Server Error: 서버 내부 오류
+- 무상태성: HTTP는 기본적으로 각 요청을 독립적으로 수행한다(기존의 정보 저장X)
+  - 로그인 기능 만들 때 별도로 사용자 식별할 수 있는 방법이 필요
+    - 쿠키: 브라우저에 저장되는 작은 데이터 
+    - 세션: 서버가 상태를 저장. 브라우저는 단지 Session ID만 보유
+    - JWT 토큰: 클라이언트가 토큰을 들고다녀 서버의 관문을 통과할때 토큰을 보여줌
+- HTTPS: HTTP + TSL(SSL) 암호화
+  - 데이터 암호화
+  - 도청, 위/변조 방지
+  - 서버 신뢰성 향상
+- HTTP는 클라이언트가 요청해야 서버가 응답하는 구조
+  - 실시간 통신을 위해서 WebSocket과 같은 별도 기술이 존재
+2. 브라우저에 URL입력 후 요청하여 서버에서 응답하는 과정
+   - 주소창에 URL 입력
+   - DNS 조회: 브라우저가 도메인 네임을 IP주소로 변환
+   - TCP 연결: 서버와 연결을 맺는다
+   - 요청 전송: 브라우저가 HTTP 요청을 보낸다
+   - 서버 처리: 서버가 요청을 해석해 내부 로직을 수행한다
+   - 응답 반환: 내부 로직 거쳐 형성된 응답을 클라이언트에 반환
+   - 브라우저 랜더링: 브라우저가 응답을 해석해 화면에 표시한다
+  
