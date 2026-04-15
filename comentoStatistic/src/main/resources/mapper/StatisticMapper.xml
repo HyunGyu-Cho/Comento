@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.demo.comentoStatistic.dao.StatisticMapper">
+<mapper namespace="com.example.comentoStatistic.dao.StatisticMapper">
 
     <select id="selectYearLogin" parameterType="string" resultType="YearCountDto">
         select concat('20', #{year}) as year, count(*) as totCnt
@@ -18,4 +18,38 @@
         where left(ri.create_date, 4) = #{yearMonth};
     </select>
 
+    <select id="selectMonthLoginCount" resultType="MonthlyLoginDto">
+        select date_format(ll.login_at, '%Y-%m') AS month, count(distinct ll.member_id) AS loginCount
+        from statistic.login_log ll
+        where ll.login_at between #{startDate} and #{endDate}
+        group by date_format(ll.login_at, '%Y-%m')
+        order by month
+    </select>
+
+    <select id="selectDailyLoginCount" resultType="DailyLoginDto">
+        select date_format(ll.login_at, '%Y-%m-%d') as date, count(distinct ll.member_id) as loginCount
+        from statistic.login_log ll
+        where ll.login_at between #{startDate} and #{endDate}
+        group by date_format(ll.login_at, '%Y-%m-%d')
+        order by date
+    </select>
+
+    <select id="selectAverageDailyLogin" resultType="AverageDailyLoginDto">
+        select avg(dailyCount) as averageDailyLogin, count(*) as totalDays, sum(dailyCount) as totalLogins
+        from (
+            select date_format(ll.login_at, '%Y-%m-%d') as loginDate, count(distinct ll.member_id) as dailyCount
+            from statistic.login_log ll
+            where ll.login_at between #{startDate} and #{endDate}
+            group by date_format(ll.login_at, '%Y-%m-%d')
+        ) daily
+    </select>
+
+    <select id="selectDeptMonthlyLogin" parameterType="string" resultType="DeptMonthlyLoginDto">
+        select dept.deptName, date_format(ll.login_at, '%Y-%m') as month, count(distinct ll.member_id) as loginCount
+        from statistic.login_log ll
+        join statistic.dept dept on ll.member_id = dept.member_id
+        where ll.login_at between #{startDate} and #{endDate}
+        group by dept.deptName, date_format(ll.login_at, '%Y-%m')
+        order by deptName, month
+    </select>
 </mapper>
