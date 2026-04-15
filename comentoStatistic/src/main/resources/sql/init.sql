@@ -6,6 +6,19 @@ CREATE TABLE IF NOT EXISTS statistic.login_log (
     login_at DATETIME NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS statistic.dept (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    dept_name VARCHAR(50) NOT NULL,
+    member_id BIGINT NOT NULL,
+    emp_name VARCHAR(50) NOT NULL
+);
+
+-- dept 샘플 데이터
+INSERT INTO statistic.dept (dept_name, member_id, emp_name) VALUES
+('개발팀', 1, '홍길동'),
+('개발팀', 2, '김철수'),
+('마케팅팀', 3, '이영희');
+
 -- 샘플 데이터 (테스트용)
 INSERT INTO statistic.login_log (member_id, login_at) VALUES
 (1, '2025-01-05 09:00:00'),
