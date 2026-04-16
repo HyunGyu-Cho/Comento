@@ -56,6 +56,12 @@ public class StatisticController {
         return ResponseEntity.ok(statisticService.getAverageDailyLogins(startDate, endDate));
     }
 
+    @GetMapping(value="/daily-no-holiday", produces = "application/json")
+    public ResponseEntity<List<DailyLoginDto>> getDailyLoginsNoHoliday(
+            @RequestParam String startDate, @RequestParam String endDate) {
+        return ResponseEntity.ok(statisticService.getDailyLoginsNoHoliday(startDate, endDate));
+    }
+
     @GetMapping(value="/monthly-dept", produces = "application/json")
     public ResponseEntity<List<DeptMonthlyLoginDto>> getDeptMonthlyLogins(
             @RequestParam String startDate, @RequestParam String endDate) {

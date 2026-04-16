@@ -1,23 +1,38 @@
 ## S/W 통계 API 구축
 
 ### 구조
-- dao(service 와 MyBatis를 연결해주는 중개자 역할)
+- client (외부 API 호출)
+    - `HolidayClient.java` — 공공 공휴일 API 호출
+
+- config (설정)
+    - `RestClientConfig.java` — RestClient Bean 설정
+
+- controller (API 엔드포인트)
+    - `StatisticController.java`
+
+- dao (Service와 MyBatis를 연결하는 중개자)
     - `StatisticMapper.java`
 
-- dto
+- dto (데이터 전달 객체)
     - `DailyLoginDto.java`
     - `MonthlyLoginDto.java`
+    - `AverageDailyLoginDto.java`
+    - `DeptMonthlyLoginDto.java`
+    - `HolidayItemDto.java` — 공휴일 개별 항목
+    - `HolidayResponseDto.java` — 공공 API 응답 매핑 (중첩 클래스)
     - `YearCountDto.java`
     - `YearMonthCountDto.java`
 
-- entity(단지 mariadb 테이블 기록용)
+- entity (MariaDB 테이블 매핑)
     - `LoginLog.java`
     - `Member.java`
+    - `Dept.java`
 
-- service
-    - `StatisticService.java`
+- service (비즈니스 로직)
+    - `StatisticService.java` — 통계 조회 + 휴일 필터링
+    - `HolidayService.java` — 공휴일 목록 조회
 
-- resources(실제 SQL문)
+- resources (SQL)
     - `StatisticMapper.xml`
 
 ### API 명세서
@@ -135,13 +150,15 @@ GET /api/v1/stats/daily-avg?startDate=2024-01-01&endDate=2024-06-30
 
 ---
 
-#### 4. 휴일을 포함한 로그인 수
+#### 4. 휴일을 제외한 로그인 수
 
 | 항목 | 내용 |
 |------|------|
 | Method | `GET` |
-| URL | `/api/v1/stats/daily-with-holiday` |
-| 설명 | 기간 내 휴일(주말/공휴일)을 포함한 일자별 접속자 수를 조회한다 |
+| URL | `/api/v1/stats/daily-no-holiday` |
+| 설명 | 기간 내 휴일(주말/공휴일)을 제외한 일자별 접속자 수를 조회한다 |
+| 데이터 소스 | DB(일자별 로그인) + 공공 공휴일 API(한국천문연구원) |
+| 필터링 방식 | Service 레이어에서 공휴일 + 주말(토/일) 제외 |
 
 **Request**
 
@@ -152,7 +169,7 @@ GET /api/v1/stats/daily-avg?startDate=2024-01-01&endDate=2024-06-30
 
 **Request 예시**
 ```
-GET /api/v1/stats/daily-with-holiday?startDate=2024-03-01&endDate=2024-03-31
+GET /api/v1/stats/daily-no-holiday?startDate=2024-03-01&endDate=2024-03-31
 ```
 
 **Response 예시**
@@ -165,8 +182,22 @@ GET /api/v1/stats/daily-with-holiday?startDate=2024-03-01&endDate=2024-03-31
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| date | String | 일자 (yyyy-MM-dd, 휴일 포함) |
+| date | String | 일자 (yyyy-MM-dd, 평일만) |
 | loginCount | long | 해당 일자 고유 접속자 수 |
+
+**처리 흐름**
+```
+Controller → StatisticService
+               ├── StatisticMapper.selectDailyLoginCount()  → 일자별 로그인 전체
+               └── HolidayService.getHolidays()             → 공휴일 날짜 목록
+                    └── HolidayClient.fetchMonthHolidays()   → 공공 API 월별 호출
+               → stream 필터링 (공휴일 + 주말 제외) 후 반환
+```
+
+**예외 처리**
+- 공공 API 4xx/5xx 응답: `onStatus`로 로깅 후 빈 공휴일 목록 반환
+- 네트워크 장애/타임아웃: `try-catch`로 로깅 후 빈 공휴일 목록 반환
+- 공공 API 실패 시에도 로그인 통계 자체는 정상 반환 (휴일 필터링만 생략)
 
 ---
 
