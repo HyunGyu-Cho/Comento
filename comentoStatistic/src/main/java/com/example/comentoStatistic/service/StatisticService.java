@@ -13,26 +13,25 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class StatisticService {
 
-    @Autowired
-    StatisticMapper statisticMapper;
+    private final StatisticMapper statisticMapper;
+    private final HolidayService holidayService;
 
-    @Autowired
-    HolidayService holidayService;
-
-    public YearCountDto getYearLogins(String year) {
+    /*public YearCountDto getYearLogins(String year) {
         return statisticMapper.selectYearLogin(year);
     }
 
     public YearMonthCountDto getYearMonthLogins(String year, String month) {
 
         return statisticMapper.selectYearMonthLogin(year+month);
-    }
+    }*/
 
 
     // 1. 월별 접속자 수
@@ -51,7 +50,7 @@ public class StatisticService {
     }
 
     // 4. 휴일을 제외한 로그인 수
-    public List<DailyLoginDto> getDailyLoginsNoHoliday(String startDate, String endDate) {
+    public List<DailyLoginDto> getDailyLoginsWithoutHoliday(String startDate, String endDate) {
         List<DailyLoginDto> dailyLogins = statisticMapper.selectDailyLoginCount(startDate, endDate);
         List<String> holidays = holidayService.getHolidays(startDate, endDate);
 

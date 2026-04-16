@@ -4,7 +4,6 @@ import com.example.comentoStatistic.dto.AverageDailyLoginDto;
 import com.example.comentoStatistic.dto.DailyLoginDto;
 import com.example.comentoStatistic.dto.DeptMonthlyLoginDto;
 import com.example.comentoStatistic.dto.MonthlyLoginDto;
-import com.example.comentoStatistic.dto.YearCountDto;
 import com.example.comentoStatistic.service.StatisticService;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,9 +55,9 @@ public class StatisticController {
     }
 
     @GetMapping(value="/daily-no-holiday", produces = "application/json")
-    public ResponseEntity<List<DailyLoginDto>> getDailyLoginsNoHoliday(
+    public ResponseEntity<List<DailyLoginDto>> getDailyLoginsWithoutHoliday(
             @RequestParam String startDate, @RequestParam String endDate) {
-        return ResponseEntity.ok(statisticService.getDailyLoginsNoHoliday(startDate, endDate));
+        return ResponseEntity.ok(statisticService.getDailyLoginsWithoutHoliday(startDate, endDate));
     }
 
     @GetMapping(value="/monthly-dept", produces = "application/json")

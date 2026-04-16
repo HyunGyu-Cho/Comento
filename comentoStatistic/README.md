@@ -187,11 +187,12 @@ GET /api/v1/stats/daily-no-holiday?startDate=2024-03-01&endDate=2024-03-31
 
 **처리 흐름**
 ```
-Controller → StatisticService
-               ├── StatisticMapper.selectDailyLoginCount()  → 일자별 로그인 전체
-               └── HolidayService.getHolidays()             → 공휴일 날짜 목록
-                    └── HolidayClient.fetchMonthHolidays()   → 공공 API 월별 호출
-               → stream 필터링 (공휴일 + 주말 제외) 후 반환
+Controller.getDailyLoginsWithoutHoliday()
+  → StatisticService.getDailyLoginsWithoutHoliday()
+      ├── StatisticMapper.selectDailyLoginCount()  → 일자별 로그인 전체
+      └── HolidayService.getHolidays()             → 공휴일 날짜 목록
+           └── HolidayClient.fetchMonthHolidays()   → 공공 API 월별 호출
+      → stream 필터링 (공휴일 + 주말 제외) 후 반환
 ```
 
 **예외 처리**

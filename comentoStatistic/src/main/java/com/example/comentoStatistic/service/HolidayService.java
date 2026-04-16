@@ -9,14 +9,13 @@ import org.springframework.stereotype.Service;
 import com.example.comentoStatistic.client.HolidayClient;
 import com.example.comentoStatistic.dto.HolidayItemDto;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class HolidayService {
 
     private final HolidayClient holidayClient;
-
-    public HolidayService(HolidayClient holidayClient) {
-        this.holidayClient = holidayClient;
-    }
 
     public List<String> getHolidays(String startDate, String endDate) {
         List<String> holidays = new ArrayList<>();
