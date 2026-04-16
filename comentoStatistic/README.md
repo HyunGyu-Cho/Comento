@@ -236,3 +236,54 @@ GET /api/v1/stats/monthly-dept?startDate=2024-01&endDate=2024-06
 | month | String | 월 (yyyy-MM) |
 | loginCount | long | 해당 부서의 월별 고유 접속자 수 |
 
+---
+
+## 테스트 전략
+
+현재 테스트는 "DB와 외부 API를 같이 붙여보는 데모성 확인"보다, 각 계층의 책임이 실제로 맞게 동작하는지를 빠르고 안정적으로 검증하는 방향으로 구성했다.
+
+### 왜 이렇게 나눴는가
+
+- 컨트롤러 테스트는 HTTP 계약에 집중한다.
+- 서비스 테스트는 비즈니스 규칙에 집중한다.
+- 외부 공휴일 API는 단위 테스트에서 Mock 처리한다.
+
+세부적으로는 아래를 확인한다.
+
+- 요청 파라미터가 올바르게 전달되는지
+- 응답 상태 코드와 JSON 필드 구조가 맞는지
+- 공휴일과 주말 제외 규칙이 깨지지 않는지
+- Mapper와 외부 서비스 호출 위임이 올바른지
+
+### 테스트 구성
+
+- `StatisticControllerTest`
+  - `@WebMvcTest` 기반
+  - `StatisticService`를 Mock 처리
+  - 엔드포인트의 요청/응답 계약 검증
+- `StatisticServiceTest`
+  - Mockito 기반 단위 테스트
+  - `StatisticMapper`, `HolidayService`를 Mock 처리
+  - `daily-no-holiday`의 핵심 필터링 규칙 검증
+- `HolidayServiceTest`
+  - 월 단위 공휴일 수집과 날짜 포맷 변환 검증
+  - 잘못된 `locdate` 데이터 무시 여부 검증
+
+### 실행 방법
+
+```bash
+./mvnw test
+```
+
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd test
+```
+
+### 이번에 의도적으로 제외한 것
+
+- 실제 MariaDB를 붙인 통합 테스트
+- 실제 공공 공휴일 API 호출 테스트
+
+이 둘은 로컬에서는 재현성이 낮고 유지비가 크다. 실무에서는 이런 영역을 별도의 통합 테스트 환경이나 QA 시나리오로 분리하고, 기본 CI 테스트는 지금처럼 빠르고 결정적인 단위/슬라이스 테스트로 유지하는 편이 일반적이다.
